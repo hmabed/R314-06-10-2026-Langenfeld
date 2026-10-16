@@ -21,13 +21,23 @@ jobs:
             export PATH="$HOME/.bun/bin:$PATH"
 
             cd /var/www/clients/R314-06-10-2026-Langenfeld
-
+            echo "======================================"
+            echo "Début du pulling"
+            echo "======================================"
             git pull origin main
-            bun install --frozen-lockfile
+
+            echo "======================================"
+            echo "Début du génération de code"
+            echo "======================================"
+            bun install
             bun run --bun build
-
+            echo "======================================"
+            echo "Début du redémarrage du service"
+            echo "======================================"
             # restart non-interactively and dump journal on failure
-            sudo -n systemctl restart clients || (sudo journalctl -u clients -n 200 --no-pager; exit 1)
+            sudo -n systemctl restart clients
             sudo -n systemctl status clients --no-pager
-
+            echo "======================================"
+            echo "test du service"
+            echo "======================================"
             curl --fail --retry 10 --retry-delay 2 --retry-connrefused http://localhost:3344/
